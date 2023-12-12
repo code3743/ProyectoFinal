@@ -7,8 +7,6 @@ package proyectofinal;
   */
 
 object Types {
-    type oraculo = Seq[Char] => Boolean;
+    type Oraculo = Seq[Char] => Boolean;
     val alfabeto = Seq('a', 'c', 'g', 't');
-
-  
 }

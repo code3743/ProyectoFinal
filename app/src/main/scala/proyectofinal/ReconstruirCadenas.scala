@@ -1,5 +1,5 @@
 package  proyectofinal;
-import proyectofinal.Types.oraculo;
+import proyectofinal.Types.Oraculo;
 import proyectofinal.Types.alfabeto;
 
 
@@ -13,17 +13,7 @@ class ReconstruirCadenas {
       * @param o Oráculo que acepta o rechaza cadenas.
       * @return Conjunto de cadenas de ADN de longitud n que son aceptadas por el oráculo.
       */
-
-      // Algoritmo:
-        // alfabeto = {a, c, g, t}
-        // reconstruirCadenasIngenuo(n,  ΨS):
-            
-        //     foreach w perteneciente (alfabeto^n):
-            //      do if  ΨS(w):
-                        // then return w;
-
-
-    def reconstruirCadenasIngenuo(n: Int, o: oraculo): Seq[Char] = {
+    def reconstruirCadenasIngenuo(n: Int, o: Oraculo): Seq[Char] = {
         def generarCadenas(n: Int): Seq[Seq[Char]] = {
             if (n == 0) Seq(Seq())
             else for {
@@ -35,17 +25,14 @@ class ReconstruirCadenas {
     }
 
     
-    // reconstruirCadenasMejorado(N,  ΨS):
-        // SC0 = { lambda  }
-        // for k = 1 to N 
-        //      do SCk  <- SCk−1 · alfabeto
-        //      foreach w perteneciente (SCk):
-        //          do if  ~ΨS(w):
-        //              then SCk  <- SCk - {w}
-        //          else if |w| = N:
-        //              then return w;
-
-    def reconstruirCadenasMejorado(n: Int, o: oraculo): Seq[Char] = {
+   /**
+     * Función que reconstruye la cadena de ADN de longitud n que son aceptadas por el oráculo.
+     *
+     * @param n
+     * @param o
+     * @return Cadena que se esta buscando.
+     */
+    def reconstruirCadenasMejorado(n: Int, o: Oraculo): Seq[Char] = {
          def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
             if (k > n) SC
             else {
@@ -58,34 +45,14 @@ class ReconstruirCadenas {
         SC.find(_.length == n).getOrElse(Seq());
     }
 
-    // Turbo solucion:
-    // reconstruirCadenasTurbo(N,  ΨS):
-     // SC1 <- alfabeto, k <- 2
-    // while k <= N 
-    //      do SCk  <- SCk/2 · SCk/2
-    //      foreach w perteneciente (SCk):
-    //          do if  ~ΨS(w):
-    //              then SCk  <- SCk - {w}
-    //          else if |w| = N:
-    //              then return w;
+    /**
+      * Función que reconstruye la cadena de ADN de longitud n que son aceptadas por el oráculo.
+      * 
+      * @param n Longitud de las cadenas a reconstruir.
+      * @param o Oráculo que acepta o rechaza cadenas.
+      * @return Cadena que se esta buscando.
+      */
 
-    /* JOTA TURBO SOLUCION
-    def reconstruirCadenasTurbo(n: Int, o: oraculo): Seq[Char] = {
-    
-        def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
-            if (k > n) SC;
-            else {
-                val SCk = SC.flatMap(s => SC.map(a => s :+ a)).filter(o);
-            generarCadenas(k + 1, SCk);
-            }
-        }
-
-
-        val SC = generarCadenas(2, alfabeto.map(Seq(_)));
-        SC.find(o).getOrElse(Seq());
-    }
-    */
-    //KEVIN TURBO SOLUCION
     def reconstruirCadenasTurbo(N: Int, o: oraculo): Seq[Char] = {
         def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
             if (k > N) SC
@@ -99,36 +66,13 @@ class ReconstruirCadenas {
 
 
 
-    // Turbo acelerada:
-    // Filtrar(SC, k):
-    //     F ← ∅
-    //     foreach s1, s2 perteneciente (SC):
-    //         do s <- s1 . s2
-    //         if { w : w  s, |w| = k } ⊆ SC:
-    //             then F <- F ∪ {s}
-    //     return F
-
-    /* JOTA SOLUCION
-    def reconstruirCadenasTurboMejorado(n: Int, o: oraculo): Seq[Char] = {
-
-        def filtrar(SC: Seq[Seq[Char]], k: Int): Seq[Seq[Char]] = {
-            SC.flatMap(s1 => SC.map(s2 => s1 ++ s2))
-            .filter(s => s.sliding(k).forall(SC.contains));
-        }
-
-        def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
-            if (k > n) SC;
-            else {
-            val SCk = filtrar(SC, k).filter(o);
-            generarCadenas(k + 1, SCk);
-            }
-        }
-        generarCadenas(2, alfabeto.map(Seq(_)))
-          .find(w => o(w))
-          .getOrElse(Seq.empty)
-    }
-     */
-    // KEVIN SOLUCION
+    /**
+      * 
+      * 
+      * @param n Longitud de las cadenas a reconstruir.
+      * @param o Oráculo que acepta o rechaza cadenas.
+      * @return Cadena que se esta buscando.
+      */
     def reconstruirCadenasTurboAcelerada(n: Int, o: oraculo): Seq[Char] = {
 
         def filtrar(SC: Seq[Seq[Char]], k: Int): Seq[Seq[Char]] = {
@@ -157,7 +101,6 @@ class ReconstruirCadenas {
           .find(o)
           .getOrElse(Seq.empty)
     }
-
 
 }
 
