@@ -22,6 +22,7 @@ class ReconstruirCadenas {
             //      do if  ΨS(w):
                         // then return w;
 
+
     def reconstruirCadenasIngenuo(n: Int, o: oraculo): Seq[Char] = {
         def generarCadenas(n: Int): Seq[Seq[Char]] = {
             if (n == 0) Seq(Seq())
@@ -32,6 +33,7 @@ class ReconstruirCadenas {
         }
         generarCadenas(n).find(o).getOrElse(Seq());
     }
+
     
     // reconstruirCadenasMejorado(N,  ΨS):
         // SC0 = { lambda  }
@@ -56,8 +58,6 @@ class ReconstruirCadenas {
         SC.find(_.length == n).getOrElse(Seq());
     }
 
-
-
     // Turbo solucion:
     // reconstruirCadenasTurbo(N,  ΨS):
      // SC1 <- alfabeto, k <- 2
@@ -69,19 +69,34 @@ class ReconstruirCadenas {
     //          else if |w| = N:
     //              then return w;
 
+    /* JOTA TURBO SOLUCION
     def reconstruirCadenasTurbo(n: Int, o: oraculo): Seq[Char] = {
     
         def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
             if (k > n) SC;
             else {
-            val SCk = SC.flatMap(s => SC.map(a => s :+ a)).filter(o);
+                val SCk = SC.flatMap(s => SC.map(a => s :+ a)).filter(o);
             generarCadenas(k + 1, SCk);
             }
         }
 
+
         val SC = generarCadenas(2, alfabeto.map(Seq(_)));
         SC.find(o).getOrElse(Seq());
     }
+    */
+    //KEVIN TURBO SOLUCION
+    def reconstruirCadenasTurbo(N: Int, o: oraculo): Seq[Char] = {
+        def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
+            if (k > N) SC
+            else generarCadenas(k + 1, SC.flatMap(s => alfabeto.map(a => s :+ a)).filter(o))
+        }
+
+        generarCadenas(2, alfabeto.map(Seq(_)))
+          .find(w => o(w))
+          .getOrElse(Seq.empty)
+    }
+
 
 
     // Turbo acelerada:
@@ -93,6 +108,7 @@ class ReconstruirCadenas {
     //             then F <- F ∪ {s}
     //     return F
 
+    /* JOTA SOLUCION
     def reconstruirCadenasTurboMejorado(n: Int, o: oraculo): Seq[Char] = {
 
         def filtrar(SC: Seq[Seq[Char]], k: Int): Seq[Seq[Char]] = {
@@ -107,9 +123,41 @@ class ReconstruirCadenas {
             generarCadenas(k + 1, SCk);
             }
         }
+        generarCadenas(2, alfabeto.map(Seq(_)))
+          .find(w => o(w))
+          .getOrElse(Seq.empty)
+    }
+     */
+    // KEVIN SOLUCION
+    def reconstruirCadenasTurboAcelerada(n: Int, o: oraculo): Seq[Char] = {
 
-        val SC = generarCadenas(2, alfabeto.map(Seq(_)));
-        SC.find(o).getOrElse(Seq());
+        def filtrar(SC: Seq[Seq[Char]], k: Int): Seq[Seq[Char]] = {
+            var F = Seq.empty[Seq[Char]]
+            for {
+                s1 <- SC
+                s2 <- SC
+                s = s1 ++ s2
+                if (1 to k).forall(i => SC.exists(w => w.take(i) == s.take(i)))
+            } {
+                F = F :+ s
+            }
+            F
+        }
+
+        def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
+            if (k > n) SC
+            else {
+                val SCk = filtrar(SC, k).filter(o)
+                generarCadenas(k + 1, SCk)
+            }
+        }
+
+        val SC = alfabeto.map(Seq(_))
+        generarCadenas(2, SC)
+          .find(o)
+          .getOrElse(Seq.empty)
     }
 
+
 }
+
