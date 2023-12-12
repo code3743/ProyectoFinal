@@ -55,6 +55,7 @@ class ReconstruirCadenas {
       * @return Cadena que se esta buscando.
       */
 
+
     def reconstruirCadenasTurbo(N: Int, o: oraculo): Seq[Char] = {
         def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
             if (k > N) SC
@@ -66,8 +67,6 @@ class ReconstruirCadenas {
           .getOrElse(Seq.empty)
     }
 
-
-
     /**
       * 
       * 
@@ -75,8 +74,8 @@ class ReconstruirCadenas {
       * @param o Oráculo que acepta o rechaza cadenas.
       * @return Cadena que se esta buscando.
       */
-    def reconstruirCadenasTurboAcelerada(n: Int, o: oraculo): Seq[Char] = {
 
+    def reconstruirCadenasTurboAcelerada(n: Int, o: oraculo): Seq[Char] = {
         def filtrar(SC: Seq[Seq[Char]], k: Int): Seq[Seq[Char]] = {
             var F = Seq.empty[Seq[Char]]
             for {
