@@ -37,9 +37,11 @@ class ReconstruirCadenas {
             if (k > n) SC
             else {
             val SCk = SC.flatMap(s => alfabeto.map(a => s :+ a)).filter(o);
+            SCk.foreach(println);
             generarCadenas(k + 1, SCk);
             }
         }
+
 
         val SC = generarCadenas(1, Seq(Seq()));
         SC.find(_.length == n).getOrElse(Seq());
