@@ -23,6 +23,7 @@ class ReconstruirCadenas {
         }
         generarCadenas(n).find(o).getOrElse(Seq());
     }
+
     
    /**
      * Función que reconstruye la cadena de ADN de longitud n que son aceptadas por el oráculo.
@@ -36,9 +37,11 @@ class ReconstruirCadenas {
             if (k > n) SC
             else {
             val SCk = SC.flatMap(s => alfabeto.map(a => s :+ a)).filter(o);
+            SCk.foreach(println);
             generarCadenas(k + 1, SCk);
             }
         }
+
 
         val SC = generarCadenas(1, Seq(Seq()));
         SC.find(_.length == n).getOrElse(Seq());
@@ -51,27 +54,18 @@ class ReconstruirCadenas {
       * @param o Oráculo que acepta o rechaza cadenas.
       * @return Cadena que se esta buscando.
       */
-   def reconstruirCadenasTurbo(n: Int, o: Oraculo): Seq[Char] = {
 
-    def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
-        if (k > n) SC
-        else {
-        val SCk = for {
-            s <- SC
-            a <- SC
-            nuevaCadena = s ++ a
-            if o(nuevaCadena)
-        } yield nuevaCadena
 
-        generarCadenas(k + 1, SCk);
+    def reconstruirCadenasTurbo(N: Int, o: oraculo): Seq[Char] = {
+        def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
+            if (k > N) SC
+            else generarCadenas(k + 1, SC.flatMap(s => alfabeto.map(a => s :+ a)).filter(o))
         }
-    }
 
-        val SC1 = alfabeto.map(Seq(_));
-        val SCk = generarCadenas(2, SC1);
-        SCk.find(cadena => cadena.length == n).getOrElse(Seq());
+        generarCadenas(2, alfabeto.map(Seq(_)))
+          .find(w => o(w))
+          .getOrElse(Seq.empty)
     }
-
 
     /**
       * 
@@ -80,23 +74,34 @@ class ReconstruirCadenas {
       * @param o Oráculo que acepta o rechaza cadenas.
       * @return Cadena que se esta buscando.
       */
-    def reconstruirCadenasTurboMejorado(n: Int, o: Oraculo): Seq[Char] = {
 
+    def reconstruirCadenasTurboAcelerada(n: Int, o: oraculo): Seq[Char] = {
         def filtrar(SC: Seq[Seq[Char]], k: Int): Seq[Seq[Char]] = {
-            SC.flatMap(s1 => SC.map(s2 => s1 ++ s2))
-            .filter(s => s.sliding(k).forall(SC.contains));
+            var F = Seq.empty[Seq[Char]]
+            for {
+                s1 <- SC
+                s2 <- SC
+                s = s1 ++ s2
+                if (1 to k).forall(i => SC.exists(w => w.take(i) == s.take(i)))
+            } {
+                F = F :+ s
+            }
+            F
         }
 
         def generarCadenas(k: Int, SC: Seq[Seq[Char]]): Seq[Seq[Char]] = {
-            if (k > n) SC;
+            if (k > n) SC
             else {
-            val SCk = filtrar(SC, k).filter(o);
-            generarCadenas(k + 1, SCk);
+                val SCk = filtrar(SC, k).filter(o)
+                generarCadenas(k + 1, SCk)
             }
         }
 
-        val SC = generarCadenas(2, alfabeto.map(Seq(_)));
-        SC.find(o).getOrElse(Seq());
+        val SC = alfabeto.map(Seq(_))
+        generarCadenas(2, SC)
+          .find(o)
+          .getOrElse(Seq.empty)
     }
 
 }
+
