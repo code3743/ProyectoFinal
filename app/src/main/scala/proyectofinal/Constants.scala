@@ -2,11 +2,6 @@ package proyectofinal;
 import scala.util.Random;
 
 
-/**
-  * Definición de tipos de datos y alfabeto.
-  * 
-  */
-
 object Constants {
     type Oraculo = Seq[Char] => Boolean;
     val alfabeto = Seq('a', 'c', 'g', 't');
