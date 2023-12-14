@@ -15,12 +15,12 @@ object ProyectoFinal {
     val cadenaRandomN16 = generarCadenaAleatoria(16, alfabeto);
     // val cadenaRandomN32 = generarCadenaAleatoria(32, alfabeto);
     
-    // val result4 = reconstruirCadenas.reconstruirCadenasTurboMejorada(4, oraculo(cadenaRandomN4));
+    // val result4 = reconstruirCadenas.reconstruirCadenasTurbo(4, oraculo(cadenaRandomN4));
     // val result8 = reconstruirCadenas.reconstruirCadenasTurbo(8, oraculo(cadenaRandomN8));
-    println(cadenaRandomN16);
-    val result16 = reconstruirCadenas.reconstruirCadenasTurbo(16, oraculo(cadenaRandomN16));
-    println(result16 == cadenaRandomN16);
-    // val result16A = reconstruirCadenas.reconstruirCadenasTurboMejorada(16, oraculo(cadenaRandomN16));
+
+    // val result16 = reconstruirCadenas.reconstruirCadenasTurbo(16, oraculo(cadenaRandomN16));
+    
+    val result16A = reconstruirCadenas.reconstruirCadenasTurboMejorada(16, oraculo(cadenaRandomN16));
     // val result32 = reconstruirCadenas.reconstruirCadenasTurbo(32, oraculo(cadenaRandomN32));
    
     // println(cadenaRandomN4);
@@ -29,7 +29,7 @@ object ProyectoFinal {
     // println(result8 == cadenaRandomN8);
    
 
-      // println(result16A == cadenaRandomN16);
+      // println(result16 == cadenaRandomN16);
     // println(cadenaRandomN32);
     // println(result32 == cadenaRandomN32);
 

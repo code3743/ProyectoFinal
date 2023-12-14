@@ -55,7 +55,7 @@ class ReconstruirCadenas {
       */
 
    def reconstruirCadenasTurbo(n: Int, o: Oraculo): Seq[Char] = {
-        val SC = alfabeto.map(Seq(_)).filter(w => o(w))
+        val SC = alfabeto.map(Seq(_)).filter(w => o(w));
         def generarCombinaciones(cadenas: Seq[Seq[Char]], n: Int): Seq[Seq[Char]] = {
             if (n <= 1) cadenas
             else {
@@ -63,20 +63,45 @@ class ReconstruirCadenas {
                     s1 <- cadenas
                     s2 <- cadenas
                 } yield s1 ++ s2;
+                println(nuevasCadenas.length);
                 generarCombinaciones(nuevasCadenas.filter(w => o(w)), n / 2);
             }
         }
         generarCombinaciones(SC, n).head;
     }
     /**
-      * 
+      * Funcion que construye las subcadenas que son aceptadas por el oráculo filtrando por aquellas que no esten 
+      * en las cadenas candidatas
       * 
       * @param n Longitud de las cadenas a reconstruir.
       * @param o Oráculo que acepta o rechaza cadenas.
       * @return Cadena que se esta buscando.
       */
-    def generarCombinaciones(cadenas: Seq[Seq[Char]], n: Int): Seq[Seq[Char]] = {
-        // implementar 
-        Seq();
+    def reconstruirCadenasTurboMejorada(n: Int, o: Oraculo): Seq[Char] = {
+        val SC = alfabeto.map(Seq(_)).filter(w => o(w));
+
+        def filtrar(cadenasOriginales: Seq[Seq[Char]], nuevasCadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
+            if(nuevasCadenas.isEmpty) Seq()
+            else if (nuevasCadenas.head.length == 2 ) nuevasCadenas
+            else
+            nuevasCadenas.filter { nuevaCadena =>
+                val pares = nuevaCadena.sliding(nuevaCadena.length / 2, 1).toList
+                pares.forall(cadenasOriginales.contains)
+            }
+        }
+        
+        def generarCombinaciones(cadenas: Seq[Seq[Char]], n: Int): Seq[Seq[Char]] = {
+            if (n <= 1) cadenas
+            else {
+                val nuevasCadenas = for {
+                    s1 <- cadenas
+                    s2 <- cadenas
+                } yield s1 ++ s2;
+                val filtrado = filtrar(cadenas, nuevasCadenas);
+                generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
+            }
+        }
+        generarCombinaciones(SC, n).head;
+     
     }
 }
