@@ -14,4 +14,9 @@ object Trie {
     case Nodo(car, marcado, hijos) => hijos.map(raiz);
     case Hoja(car, marcado) => Seq[Char](car);
   }
+
+
+  
 }
+
+

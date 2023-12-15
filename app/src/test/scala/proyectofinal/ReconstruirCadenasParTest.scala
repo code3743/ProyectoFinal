@@ -5,8 +5,8 @@ import org.scalatestplus.junit.JUnitRunner
 import proyectofinal.Constants.{Oraculo, alfabeto, generarCadenaAleatoria, oraculo};
 
 @RunWith(classOf[JUnitRunner])
-class ReconstruirCadenasTest extends AnyFunSuite {
-    val reconstruirCadenas = new ReconstruirCadenas();
+class ReconstruirCadenasParTest extends AnyFunSuite {
+    val reconstruirCadenas = new ReconstruirCadenasPar();
     
     
     test("Test reconstruirCadenasIngenuo") {

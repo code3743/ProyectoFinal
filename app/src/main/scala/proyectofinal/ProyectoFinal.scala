@@ -1,43 +1,39 @@
 package proyectofinal;
+import org.scalameter.measure
+import org.scalameter.withWarmer
+import org.scalameter.Warmer
 import proyectofinal.Constants.{Oraculo, alfabeto, generarCadenaAleatoria, oraculo};
+import proyectofinal.Trie.{Trie, Hoja, Nodo};
 
 
 object ProyectoFinal {
 
-  
-
   def main(args: Array[String]): Unit = {
 
+    val benchmark = new Benchmark();
     val reconstruirCadenas = new ReconstruirCadenas();
-    
-    // val cadenaRandomN4 = generarCadenaAleatoria(4, alfabeto);
-    // val cadenaRandomN8 = generarCadenaAleatoria(8, alfabeto);
-    val cadenaRandomN16 = generarCadenaAleatoria(16, alfabeto);
-    // val cadenaRandomN32 = generarCadenaAleatoria(32, alfabeto);
-    
-    // val result4 = reconstruirCadenas.reconstruirCadenasTurbo(4, oraculo(cadenaRandomN4));
-    // val result8 = reconstruirCadenas.reconstruirCadenasTurbo(8, oraculo(cadenaRandomN8));
+    val reconstruirCadenasPar = new ReconstruirCadenasPar();
+    println(
+      withWarmer(new Warmer.Default) measure {
+        (1 to 100000000).toArray
+      }
+    );
 
-    // val result16 = reconstruirCadenas.reconstruirCadenasTurbo(16, oraculo(cadenaRandomN16));
-    
-    val result16A = reconstruirCadenas.reconstruirCadenasTurboMejorada(16, oraculo(cadenaRandomN16));
-    val result16B = reconstruirCadenas.reconstruirCadenasTurboAcelerado(16, oraculo(cadenaRandomN16));
-    // val result32 = reconstruirCadenas.reconstruirCadenasTurbo(32, oraculo(cadenaRandomN32));
-   
-    // println(cadenaRandomN4);
-    // println(result4 == cadenaRandomN4);
-    // println(cadenaRandomN8);
-    // println(result8 == cadenaRandomN8);
-   
+  //   for {
+  //     i <- 1 to 10
+  //     n = math.pow(2, i).toInt
+  //     secuencia = generarCadenaAleatoria(n, alfabeto)
+  //   } yield {
+  //       val ( secuencial, paralelo, aceleracion ) = 
+  //         benchmark.compararAlgoritmos(reconstruirCadenas.reconstruirCadenasMejorado,
+  //             reconstruirCadenas.reconstruirCadenasTurbo)(n, oraculo(secuencia));
+  //       println("Cadenas de " + n + " Caracteres");
+  //       println("Tiempo secuencial: " + secuencial);
+  //       println("Tiempo paralelo: " + paralelo);
+  //       println("Aceleracion: " + aceleracion);
+  //   }
 
-      println(result16A == cadenaRandomN16);
-      println(result16B == cadenaRandomN16);
-    // println(cadenaRandomN32);
-    // println(result32 == cadenaRandomN32);
-
-
-    
   }
-}
 
+}
 

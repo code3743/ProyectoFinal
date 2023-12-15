@@ -1,8 +1,6 @@
 package  proyectofinal;
 import proyectofinal.Constants.{Oraculo, alfabeto};
-import proyectofinal.Trie.Trie;
-
-
+import proyectofinal.Trie.{Trie, Hoja, Nodo};
 
 class ReconstruirCadenas {
 
@@ -64,7 +62,6 @@ class ReconstruirCadenas {
                     s1 <- cadenas
                     s2 <- cadenas
                 } yield s1 ++ s2;
-                println(nuevasCadenas.length);
                 generarCombinaciones(nuevasCadenas.filter(w => o(w)), n / 2);
             }
         }
@@ -101,21 +98,23 @@ class ReconstruirCadenas {
             }
         }
         generarCombinaciones(SC, n).head;
-     
     }
-
+    /**
+     * 
+     * @param n Longitud de las cadenas a reconstruir.
+     * @param o Oráculo que acepta o rechaza cadenas.
+     * @return
+     */
    def reconstruirCadenasTurboAcelerado(n: Int, o: Oraculo): Seq[Char] = {
-        val SC = alfabeto.map(Seq(_)).filter(w => o(w))
-
-        def filtrar(cadenasOriginales: Trie, nuevasCadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
-            if (nuevasCadenas.head.length == 2) nuevasCadenas;
-            else
-            nuevasCadenas.filter { nuevaCadena =>
-                val pares = nuevaCadena.sliding(nuevaCadena.length / 2, 1).toList;
-                pares.forall(cadena => Trie.cabezas(cadenasOriginales).contains(cadena.head));
-            }
-        }
-
+        val SC = alfabeto.map(Seq(_)).filter(w => o(w));
+        // def filtrar(cadenasOriginales: Trie, nuevasCadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
+        //     if (nuevasCadenas.head.length == 2) nuevasCadenas;
+        //     else
+        //     nuevasCadenas.filter { nuevaCadena =>
+        //         val pares = nuevaCadena.sliding(nuevaCadena.length / 2, 1).toList;
+        //         pares.forall(cadena => Trie.cabezas(cadenasOriginales).contains(cadena.head));
+        //     }
+        // }
         def generarCombinaciones(cadenas: Seq[Seq[Char]], n: Int): Seq[Seq[Char]] = {
             if (n <= 1) cadenas;
             else {
@@ -123,10 +122,15 @@ class ReconstruirCadenas {
                 s1 <- cadenas
                 s2 <- cadenas
             } yield s1 ++ s2
-            val filtrado = filtrar(Trie.Nodo(' ', false, SC.map(cadena => Trie.Hoja(cadena.head, true))), nuevasCadenas);
-            generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
+            // val arbol = Nodo(' ', false, cadenas.map(cadena => Hoja(cadena.head, true)));
+            // println(arbol);
+            // val filtrado = filtrar(arbol, nuevasCadenas);
+            generarCombinaciones(nuevasCadenas.filter(w => o(w)), n / 2);
             }
         }
-        generarCombinaciones(SC, n).head
+        generarCombinaciones(SC, n).head;
     }
+
+
+ 
 }
