@@ -87,28 +87,20 @@ class ReconstruirCadenas {
     */
   def reconstruirCadenasTurboMejorada(n: Int, o: Oraculo): Seq[Char] = {
     val SC = alfabeto.map(Seq(_)).filter(w => o(w));
-
-    def filtrar(
-        cadenasOriginales: Seq[Seq[Char]],
-        nuevasCadenas: Seq[Seq[Char]]
-    ): Seq[Seq[Char]] = {
-      if (nuevasCadenas.head.length == 2) nuevasCadenas;
-      else
-        nuevasCadenas.filter { nuevaCadena =>
-          nuevaCadena.view
-            .sliding(nuevaCadena.length / 2, 1)
-            .forall(par => cadenasOriginales.contains(par.toList));
-        }
-    }
     def generarCombinaciones(
         cadenas: Seq[Seq[Char]],
         n: Int
     ): Seq[Seq[Char]] = {
       if (n <= 1) cadenas
       else {
-        val nuevasCadenas =
-          cadenas.view.flatMap(s1 => cadenas.map(s2 => s1 ++ s2)).toSeq;
-        val filtrado = filtrar(cadenas, nuevasCadenas);
+        val filtrado = cadenas.view.flatMap { s1 =>
+                  cadenas.flatMap { s2 =>
+                    val nuevaCadena = s1 ++ s2;
+                    if (nuevaCadena.length == 2 || nuevaCadena.view.sliding(nuevaCadena.length / 2, 1).forall(par => cadenas.contains(par.toList))) {
+                      Some(nuevaCadena);
+                    } else None
+                  }
+        }.toSeq
         generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
       }
     }
@@ -135,33 +127,25 @@ class ReconstruirCadenas {
 
     val SC = alfabeto.map(Seq(_)).filter(w => o(w));
 
-    def filtrar(
-        cadenasOriginales: Trie,
-        nuevasCadenas: Seq[Seq[Char]]
-    ): Seq[Seq[Char]] = {
-      if (nuevasCadenas.head.length == 2) nuevasCadenas;
-      else
-        nuevasCadenas.filter { nuevaCadena =>
-            nuevaCadena.view
-              .sliding(nuevaCadena.length / 2, 1)
-              .forall(par => buscar(cadenasOriginales, par.toList));
-          
-        }
-    }
     def generarCombinaciones(
         cadenas: Seq[Seq[Char]],
         n: Int
     ): Seq[Seq[Char]] = {
       if (n <= 1) cadenas;
       else {
-        val nuevasCadenas =
-          cadenas.view.flatMap(s1 => cadenas.map(s2 => s1 ++ s2)).toSeq;
         val cadenasArboles = cadenas
           .map(lista => transformarCadena(lista, Seq() :+ lista))
           .flatten
           .sortBy(_.length);
         val arbol = construirTrie(cadenasArboles);
-        val filtrado = filtrar(arbol, nuevasCadenas);
+        val filtrado = cadenas.view.flatMap { s1 =>
+                  cadenas.flatMap { s2 =>
+                    val nuevaCadena = s1 ++ s2;
+                    if (nuevaCadena.length == 2 || nuevaCadena.view.sliding(nuevaCadena.length / 2, 1).forall(par => buscar(arbol, par.toList))) {
+                      Some(nuevaCadena);
+                    } else None
+                  }
+        }.toSeq
         generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
       }
     }
