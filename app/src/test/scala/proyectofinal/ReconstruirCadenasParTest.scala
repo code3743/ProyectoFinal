@@ -61,4 +61,19 @@ class ReconstruirCadenasParTest extends AnyFunSuite {
         assert(result64 == cadenaRandomN64);
     }
 
+    test("Test recontruirCadenasTurboAcelerado"){
+        val cadenaRandomN4 = generarCadenaAleatoria(4, alfabeto);
+        val cadenaRandomN16 = generarCadenaAleatoria(16, alfabeto);
+        val cadenaRandomN32 = generarCadenaAleatoria(32, alfabeto);
+        val cadenaRandomN64 = generarCadenaAleatoria(64, alfabeto);
+        val result4 = reconstruirCadenas.reconstruirCadenasTurboAcelerado(4, oraculo(cadenaRandomN4));
+        val result16 = reconstruirCadenas.reconstruirCadenasTurboAcelerado(16, oraculo(cadenaRandomN16));
+        val result32 = reconstruirCadenas.reconstruirCadenasTurboAcelerado(32, oraculo(cadenaRandomN32));
+        val result64 = reconstruirCadenas.reconstruirCadenasTurboAcelerado(64, oraculo(cadenaRandomN64));
+        assert(result4 == cadenaRandomN4);
+        assert(result16 == cadenaRandomN16);
+        assert(result32 == cadenaRandomN32);
+        assert(result64 == cadenaRandomN64);
+    }
+
 }

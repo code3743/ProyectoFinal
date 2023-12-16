@@ -1,136 +1,170 @@
-package  proyectofinal;
+package proyectofinal;
+import scala.annotation.tailrec
 import proyectofinal.Constants.{Oraculo, alfabeto};
-import proyectofinal.Trie.{Trie, Hoja, Nodo};
+import proyectofinal.Trie.{Trie, Nodo, Hoja, construirTrie, buscar};
 
 class ReconstruirCadenas {
 
-    /**
-      * Funcion que genera todas las cadenas de ADN de longitud n y comprueba si son aceptadas por el oráculo.
-      * 
-      * @param n Longitud de las cadenas a reconstruir.
-      * @param o Oráculo que acepta o rechaza cadenas.
-      * @return Conjunto de cadenas de ADN de longitud n que son aceptadas por el oráculo.
-      */
-    def reconstruirCadenasIngenuo(n: Int, o: Oraculo): Seq[Char] = {
-        def generarCadenas(n: Int): Seq[Seq[Char]] = {
-            if (n == 0) Seq(Seq())
-            else for {
-            letra <- alfabeto
-            cadena <- generarCadenas(n - 1)
-            } yield cadena :+ letra;
+  /** Funcion que genera todas las cadenas de ADN de longitud n y comprueba si
+    * son aceptadas por el oráculo.
+    *
+    * @param n
+    *   Longitud de las cadenas a reconstruir.
+    * @param o
+    *   Oráculo que acepta o rechaza cadenas.
+    * @return
+    *   Conjunto de cadenas de ADN de longitud n que son aceptadas por el
+    *   oráculo.
+    */
+  def reconstruirCadenasIngenuo(n: Int, o: Oraculo): Seq[Char] = {
+    def generarCadenas(n: Int): Seq[Seq[Char]] = {
+      if (n == 0) Seq(Seq());
+      else
+        alfabeto.flatMap(letra =>
+          generarCadenas(n - 1).map(cadena => cadena :+ letra)
+        );
+    }
+    generarCadenas(n).find(o).getOrElse(Seq());
+  }
+
+  /** Funcion que construye las subcadenas que son aceptadas por el oráculo para
+    * reconstruir la cadena de ADN de longitud n.
+    *
+    * @param n
+    * @param o
+    * @return
+    *   Cadena que se esta buscando.
+    */
+  def reconstruirCadenasMejorado(n: Int, o: Oraculo): Seq[Char] = {
+    val SC = alfabeto.map(Seq(_)).filter(w => o(w));
+    def generarCombinaciones(
+        cadenas: Seq[Seq[Char]],
+        n: Int
+    ): Seq[Seq[Char]] = {
+      if (n == 1) cadenas;
+      else {
+        val nuevasCadenas =
+          cadenas.view.flatMap(s1 => SC.map(s2 => s1 ++ s2)).toSeq;
+        generarCombinaciones(nuevasCadenas.filter(w => o(w)), n - 1);
+      }
+    }
+    generarCombinaciones(SC, n).head;
+  }
+
+  /** @param n
+    *   Longitud de las cadenas a reconstruir.
+    * @param o
+    *   Oráculo que acepta o rechaza cadenas.
+    * @return
+    *   Cadena que se esta buscando.
+    */
+
+  def reconstruirCadenasTurbo(n: Int, o: Oraculo): Seq[Char] = {
+    val SC = alfabeto.map(Seq(_)).filter(w => o(w));
+    def generarCombinaciones(
+        cadenas: Seq[Seq[Char]],
+        n: Int
+    ): Seq[Seq[Char]] = {
+      if (n <= 1) cadenas
+      else {
+        val nuevasCadenas =
+          cadenas.view.flatMap(s1 => cadenas.map(s2 => s1 ++ s2)).toSeq;
+        generarCombinaciones(nuevasCadenas.filter(w => o(w)), n / 2);
+      }
+    }
+    generarCombinaciones(SC, n).head;
+  }
+
+  /** Funcion que construye las subcadenas que son aceptadas por el oráculo
+    * filtrando por aquellas que no esten en las cadenas candidatas
+    *
+    * @param n
+    *   Longitud de las cadenas a reconstruir.
+    * @param o
+    *   Oráculo que acepta o rechaza cadenas.
+    * @return
+    *   Cadena que se esta buscando.
+    */
+  def reconstruirCadenasTurboMejorada(n: Int, o: Oraculo): Seq[Char] = {
+    val SC = alfabeto.map(Seq(_)).filter(w => o(w));
+
+    def filtrar(
+        cadenasOriginales: Seq[Seq[Char]],
+        nuevasCadenas: Seq[Seq[Char]]
+    ): Seq[Seq[Char]] = {
+      if (nuevasCadenas.head.length == 2) nuevasCadenas;
+      else
+        nuevasCadenas.filter { nuevaCadena =>
+          nuevaCadena.view
+            .sliding(nuevaCadena.length / 2, 1)
+            .forall(par => cadenasOriginales.contains(par.toList));
         }
-       generarCadenas(n).find(o).getOrElse(Seq());
+    }
+    def generarCombinaciones(
+        cadenas: Seq[Seq[Char]],
+        n: Int
+    ): Seq[Seq[Char]] = {
+      if (n <= 1) cadenas
+      else {
+        val nuevasCadenas =
+          cadenas.view.flatMap(s1 => cadenas.map(s2 => s1 ++ s2)).toSeq;
+        val filtrado = filtrar(cadenas, nuevasCadenas);
+        generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
+      }
+    }
+    generarCombinaciones(SC, n).head;
+  }
+
+  /** @param n
+    *   Longitud de las cadenas a reconstruir.
+    * @param o
+    *   Oráculo que acepta o rechaza cadenas.
+    * @return
+    */
+  def reconstruirCadenasTurboAcelerado(n: Int, o: Oraculo): Seq[Char] = {
+
+    @tailrec
+    def transformarCadena(
+        s: Seq[Char],
+        acc: Seq[Seq[Char]] = Seq.empty
+    ): Seq[Seq[Char]] = s match {
+      case Nil                    => acc
+      case x :: xs if xs.nonEmpty => transformarCadena(xs, xs +: acc)
+      case _                      => acc
     }
 
-    
-   /**
-     * Funcion que construye las subcadenas que son aceptadas por el oráculo para reconstruir la cadena de ADN de longitud n.
-     *
-     * @param n
-     * @param o
-     * @return Cadena que se esta buscando.
-     */
-     def reconstruirCadenasMejorado(n: Int, o: Oraculo): Seq[Char] = {
-         val SC = alfabeto.map(Seq(_)).filter(w => o(w));
-         def generarCombinaciones(cadenas: Seq[Seq[Char]], n: Int): Seq[Seq[Char]] = {
-             if (n == 1) cadenas
-             else {
-             val nuevasCadenas = for {
-                 s1 <- cadenas
-                 s2 <- SC
-             } yield s1 ++ s2
-             generarCombinaciones(nuevasCadenas.filter(w => o(w)), n - 1);
-             }
-         }
-         generarCombinaciones(SC, n).head;
-    }
+    val SC = alfabeto.map(Seq(_)).filter(w => o(w));
 
-    /**
-      * 
-      * 
-      * @param n Longitud de las cadenas a reconstruir.
-      * @param o Oráculo que acepta o rechaza cadenas.
-      * @return Cadena que se esta buscando.
-      */
-
-   def reconstruirCadenasTurbo(n: Int, o: Oraculo): Seq[Char] = {
-        val SC = alfabeto.map(Seq(_)).filter(w => o(w));
-        def generarCombinaciones(cadenas: Seq[Seq[Char]], n: Int): Seq[Seq[Char]] = {
-            if (n <= 1) cadenas
-            else {
-                val nuevasCadenas = for {
-                    s1 <- cadenas
-                    s2 <- cadenas
-                } yield s1 ++ s2;
-                generarCombinaciones(nuevasCadenas.filter(w => o(w)), n / 2);
-            }
+    def filtrar(
+        cadenasOriginales: Trie,
+        nuevasCadenas: Seq[Seq[Char]]
+    ): Seq[Seq[Char]] = {
+      if (nuevasCadenas.head.length == 2) nuevasCadenas;
+      else
+        nuevasCadenas.filter { nuevaCadena =>
+            nuevaCadena.view
+              .sliding(nuevaCadena.length / 2, 1)
+              .forall(par => buscar(cadenasOriginales, par.toList));
+          
         }
-        generarCombinaciones(SC, n).head;
     }
-    /**
-      * Funcion que construye las subcadenas que son aceptadas por el oráculo filtrando por aquellas que no esten 
-      * en las cadenas candidatas
-      * 
-      * @param n Longitud de las cadenas a reconstruir.
-      * @param o Oráculo que acepta o rechaza cadenas.
-      * @return Cadena que se esta buscando.
-      */
-    def reconstruirCadenasTurboMejorada(n: Int, o: Oraculo): Seq[Char] = {
-        val SC = alfabeto.map(Seq(_)).filter(w => o(w));
-
-        def filtrar(cadenasOriginales: Seq[Seq[Char]], nuevasCadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
-            if (nuevasCadenas.head.length == 2 ) nuevasCadenas;
-            else
-            nuevasCadenas.filter { nuevaCadena =>
-                val pares = nuevaCadena.sliding(nuevaCadena.length / 2, 1).toList
-                pares.forall(cadenasOriginales.contains)
-            }
-        }  
-        def generarCombinaciones(cadenas: Seq[Seq[Char]], n: Int): Seq[Seq[Char]] = {
-            if (n <= 1) cadenas
-            else {
-                val nuevasCadenas = for {
-                    s1 <- cadenas
-                    s2 <- cadenas
-                } yield s1 ++ s2;
-                val filtrado = filtrar(cadenas, nuevasCadenas);
-                generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
-            }
-        }
-        generarCombinaciones(SC, n).head;
+    def generarCombinaciones(
+        cadenas: Seq[Seq[Char]],
+        n: Int
+    ): Seq[Seq[Char]] = {
+      if (n <= 1) cadenas;
+      else {
+        val nuevasCadenas =
+          cadenas.view.flatMap(s1 => cadenas.map(s2 => s1 ++ s2)).toSeq;
+        val cadenasArboles = cadenas
+          .map(lista => transformarCadena(lista, Seq() :+ lista))
+          .flatten
+          .sortBy(_.length);
+        val arbol = construirTrie(cadenasArboles);
+        val filtrado = filtrar(arbol, nuevasCadenas);
+        generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
+      }
     }
-    /**
-     * 
-     * @param n Longitud de las cadenas a reconstruir.
-     * @param o Oráculo que acepta o rechaza cadenas.
-     * @return
-     */
-   def reconstruirCadenasTurboAcelerado(n: Int, o: Oraculo): Seq[Char] = {
-        val SC = alfabeto.map(Seq(_)).filter(w => o(w));
-        // def filtrar(cadenasOriginales: Trie, nuevasCadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
-        //     if (nuevasCadenas.head.length == 2) nuevasCadenas;
-        //     else
-        //     nuevasCadenas.filter { nuevaCadena =>
-        //         val pares = nuevaCadena.sliding(nuevaCadena.length / 2, 1).toList;
-        //         pares.forall(cadena => Trie.cabezas(cadenasOriginales).contains(cadena.head));
-        //     }
-        // }
-        def generarCombinaciones(cadenas: Seq[Seq[Char]], n: Int): Seq[Seq[Char]] = {
-            if (n <= 1) cadenas;
-            else {
-            val nuevasCadenas = for {
-                s1 <- cadenas
-                s2 <- cadenas
-            } yield s1 ++ s2
-            // val arbol = Nodo(' ', false, cadenas.map(cadena => Hoja(cadena.head, true)));
-            // println(arbol);
-            // val filtrado = filtrar(arbol, nuevasCadenas);
-            generarCombinaciones(nuevasCadenas.filter(w => o(w)), n / 2);
-            }
-        }
-        generarCombinaciones(SC, n).head;
-    }
-
-
- 
+    generarCombinaciones(SC, n).head;
+  }
 }
