@@ -18,4 +18,12 @@ class Benchmark {
         val promedio = timeF1.value / timeF2.value;
         (timeF1.value, timeF2.value, promedio);
     }
+
+
+    def tomarTiempoEjecucion(Funcion:(Int,Oraculo) => Seq[Char])(n: Int, o: Oraculo): Double = {
+        val timeF = withWarmer(new Warmer.Default) measure {
+            Funcion(n, o);
+        }
+        timeF.value;
+    }
 }
