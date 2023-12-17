@@ -48,7 +48,6 @@ object Trie {
   palabra match {
     case Nil => raiz
     case c :: cs => raiz match {
-      case Hoja(_, _) => throw new Exception("No se puede insertar en una hoja")
       case Nodo(car, marcado, hijos) =>
         val hijo = hijos.find {
           case Nodo(hijoCar, _, _) => hijoCar == c
