@@ -70,25 +70,36 @@ class ReconstruirCadenasPar {
 
   def reconstruirCadenasTurboMejorada(n: Int, o: Oraculo): Seq[Char] = {
     val SC = alfabeto.map(Seq(_)).filter(w => o(w));
-    def generarCombinaciones(
-        cadenas: Seq[Seq[Char]],
-        n: Int
-    ): Seq[Seq[Char]] = {
-      if (n <= 1) cadenas;
-      else {
-        val filtrado =  cadenas.flatMap { s1 =>
+
+    def filtrarCadenas(cadena: Seq[Seq[Char]], cadenas: Seq[Seq[Char]]): Seq[Seq[Char]] = {
+     cadena.flatMap { s1 =>
                   cadenas.flatMap { s2 =>
                     val nuevaCadena = s1 ++ s2;
+                 
                     if (nuevaCadena.length == 2 || nuevaCadena.sliding(nuevaCadena.length / 2).forall(cadenas.contains)) {
                       Some(nuevaCadena);
                     } else None
                   }
-        }
-        generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
       }
     }
-    generarCombinaciones(SC, n).head;
-  }
+
+    def generarCombinaciones(
+        cadenas: Seq[Seq[Char]],
+        n: Int       
+    ): Seq[Seq[Char]] = {
+      if (n <= 1) cadenas;
+      else {
+        val (parte1, parte2) =  parallel(
+                  filtrarCadenas(cadenas.take(cadenas.length / 2), cadenas),
+                  filtrarCadenas(cadenas.drop(cadenas.length / 2), cadenas));
+        generarCombinaciones((parte1 ++ parte2).filter(w => o(w)), n / 2);    
+      }
+      }
+       generarCombinaciones(SC, n).head;
+    }
+   
+  
+
   def reconstruirCadenasTurboAcelerado(n: Int, o: Oraculo): Seq[Char] = {
 
     @tailrec
@@ -101,19 +112,8 @@ class ReconstruirCadenasPar {
       case _                      => acc
     }
 
-    val SC = alfabeto.map(Seq(_)).filter(w => o(w));
-    def generarCombinaciones(
-        cadenas: Seq[Seq[Char]],
-        n: Int
-    ): Seq[Seq[Char]] = {
-      if (n <= 1) cadenas;
-      else {
-       val cadenasArboles = cadenas
-          .map(lista => transformarCadena(lista, Seq() :+ lista))
-          .flatten
-          .sortBy(_.length);
-        val arbol = construirTrie(cadenasArboles);
-        val filtrado = cadenas.flatMap { s1 =>
+    def filtrar(cadena:Seq[Seq[Char]], arbol: Trie, cadenas:Seq[Seq[Char]]): Seq[Seq[Char]] = {
+      cadena.flatMap { s1 =>
                   cadenas.flatMap { s2 =>
                     val nuevaCadena = s1 ++ s2;
                     if (nuevaCadena.length == 2 || nuevaCadena.sliding(nuevaCadena.length / 2).forall(par => buscar(arbol, par))) {
@@ -121,10 +121,34 @@ class ReconstruirCadenasPar {
                     } else None
                   }
                 }
-        generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
+    }
+
+    val SC = alfabeto.map(Seq(_)).filter(w => o(w));
+    def generarCombinaciones(
+        cadenas: Seq[Seq[Char]],
+        n: Int
+    ): Seq[Seq[Char]] = {
+      if (n <= 1) cadenas;
+      else {
+        val (parte1, parte2) = parallel(
+          cadenas.take(cadenas.length / 2)
+          .map(lista => transformarCadena(lista, Seq() :+ lista))
+          .flatten
+          .sortBy(_.length),
+          cadenas.drop(cadenas.length / 2)
+          .map(lista => transformarCadena(lista, Seq() :+ lista))
+          .flatten
+          .sortBy(_.length)
+         );
+
+        val arbol = construirTrie(parte1 ++ parte2);
+
+        val (filtro1, filtro2 )= parallel ( filtrar(cadenas.take(cadenas.length / 2), arbol, cadenas),
+               filtrar(cadenas.drop(cadenas.length / 2), arbol, cadenas));
+        generarCombinaciones((filtro1 ++ filtro2).filter(w => o(w)), n / 2);
       }
     }
     generarCombinaciones(SC, n).head;
   }
- 
 }
+
