@@ -44,7 +44,7 @@ class ReconstruirCadenas {
       if (n == 1) cadenas;
       else {
         val nuevasCadenas =
-          cadenas.view.flatMap(s1 => SC.map(s2 => s1 ++ s2)).toSeq;
+          cadenas.flatMap(s1 => SC.map(s2 => s1 ++ s2));
         generarCombinaciones(nuevasCadenas.filter(w => o(w)), n - 1);
       }
     }
@@ -68,7 +68,7 @@ class ReconstruirCadenas {
       if (n <= 1) cadenas
       else {
         val nuevasCadenas =
-          cadenas.view.flatMap(s1 => cadenas.map(s2 => s1 ++ s2)).toSeq;
+          cadenas.flatMap(s1 => cadenas.map(s2 => s1 ++ s2));
         generarCombinaciones(nuevasCadenas.filter(w => o(w)), n / 2);
       }
     }
@@ -93,14 +93,14 @@ class ReconstruirCadenas {
     ): Seq[Seq[Char]] = {
       if (n <= 1) cadenas
       else {
-        val filtrado = cadenas.view.flatMap { s1 =>
+        val filtrado = cadenas.flatMap { s1 =>
                   cadenas.flatMap { s2 =>
                     val nuevaCadena = s1 ++ s2;
-                    if (nuevaCadena.length == 2 || nuevaCadena.view.sliding(nuevaCadena.length / 2, 1).forall(par => cadenas.contains(par.toList))) {
+                    if (nuevaCadena.length == 2 || nuevaCadena.sliding(nuevaCadena.length / 2).forall(cadenas.contains)) {
                       Some(nuevaCadena);
                     } else None
                   }
-        }.toSeq
+        }
         generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
       }
     }
@@ -138,14 +138,14 @@ class ReconstruirCadenas {
           .flatten
           .sortBy(_.length);
         val arbol = construirTrie(cadenasArboles);
-        val filtrado = cadenas.view.flatMap { s1 =>
+        val filtrado = cadenas.flatMap { s1 =>
                   cadenas.flatMap { s2 =>
                     val nuevaCadena = s1 ++ s2;
-                    if (nuevaCadena.length == 2 || nuevaCadena.view.sliding(nuevaCadena.length / 2, 1).forall(par => buscar(arbol, par.toList))) {
+                    if (nuevaCadena.length == 2 || nuevaCadena.sliding(nuevaCadena.length / 2).forall(par => buscar(arbol, par))) {
                       Some(nuevaCadena);
                     } else None
                   }
-        }.toSeq
+        }
         generarCombinaciones(filtrado.filter(w => o(w)), n / 2);
       }
     }
